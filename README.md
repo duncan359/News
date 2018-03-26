@@ -3,7 +3,7 @@ News was using MVP Structure and implements by Eventbus and Retrofit.
 
 ## Environment
 * Android Studio 3.0.1
-* Minimun SDK 11  
+* Support SDK 11 to 25
 
 ### Structure 
 * Activity load context from **fragment** which are available in **com.duncan.read.News.view** folder 
