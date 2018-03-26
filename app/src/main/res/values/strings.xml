@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Read</string>
+    <string name="txt_post">%1$s\u002C posted by %2$s.</string>
+    <string name="txt_reply">%1$s\u002C \nreplied by %2$s.</string>
+    <string name="txt_comments">%1$s\u002C \ncommented by %2$s.</string>
+    <string name="txt_title">Top Stories</string>
+    <string name="txt_titlecomments">Comments</string>
+    <string name="txt_titlereply">Reply</string>
+    <string name="txt_titleintenet">Please Check Your Network Connection</string>
+</resources>
