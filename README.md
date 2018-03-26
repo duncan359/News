@@ -1,6 +1,11 @@
 # News
-News was using MVP Structure and implements by Eventbus and Retrofit. 
-## Structure 
+News was using MVP Structure and implements by Eventbus and Retrofit.
+
+## Environment
+* Android Studio 3.0.1
+* Minimun SDK 11  
+
+### Structure 
 * Activity load context from **fragment** which are available in **com.duncan.read.News.view** folder 
 * Fragment call presenter which are available in **com.duncan.read.News.presenter** for process **HACKER NEWS** api calling. 
 * presenter do process for request and call to Retrofit by UseCaseImpl whih are available in **com.duncan.read.News.domain** 
