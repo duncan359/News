@@ -1,4 +1,4 @@
-package com.duncan.read.domain.presentation.navigator;
+package com.duncan.read.domain.navigator;
 
 import android.content.Context;
 import android.content.Intent;

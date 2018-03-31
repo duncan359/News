@@ -3,9 +3,14 @@ package com.duncan.read.News.view;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.duncan.read.R;
+import com.duncan.read.domain.data.GetCommentResponse;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
@@ -37,6 +42,13 @@ public class CommentsActivityTest extends ActivityInstrumentationTestCase2<Comme
         onView(withId(R.id.listview_product)).check(matches(isDisplayed()));
         onView(withId(R.id.ll_home)).check(doesNotExist());
         onView(withText(R.string.txt_titlecomments)).check(matches(isDisplayed()));
+        List<GetCommentResponse> data = new ArrayList<>();
+        data.add(null);
+        data.add(null);
+        data.add(null);
+        CommentsListAdapter adapter = new CommentsListAdapter(this.getActivity(),data); // See the dependency
+        Assert.assertNotNull(adapter);
+        Assert.assertTrue(adapter.getCount() == 3);
 }
 
     @Before

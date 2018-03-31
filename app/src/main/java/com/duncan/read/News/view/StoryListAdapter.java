@@ -11,9 +11,7 @@ import com.duncan.read.domain.data.GetStoryResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,17 +30,13 @@ public class StoryListAdapter extends BaseAdapter {
     }
 
     public void addListItemToAdapter(List<GetStoryResponse> list) {
-        //Add list to current array list of data
         mStoryList.addAll(list);
-        //Notify UI
         this.notifyDataSetChanged();
     }
 
     public void resetListItemToAdapter(List<GetStoryResponse> list) {
-        //Add list to current array list of data
         mStoryList.clear();
         mStoryList.addAll(list);
-        //Notify UI
         this.notifyDataSetChanged();
     }
 
@@ -71,17 +65,18 @@ public class StoryListAdapter extends BaseAdapter {
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         }
-        holder.title.setText(String.valueOf(position+1+": "+mStoryList.get(position).getTitle()));
-        holder.name.setText(String.valueOf(mStoryList.get(position).getUrl()));
-        Calendar calendar = Calendar.getInstance();
-        long time = mStoryList.get(position).getTime()*1000;
-        calendar.setTimeInMillis(time);
-        //Date d = new Date(mStoryList.get(position).getTime());
-        SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy,HH:mm");
-       // f.setTimeZone(tz);
-        String s = f.format(calendar.getTime());
-        holder.time.setText(mContext.getResources().getString(R.string.txt_post,s,String.valueOf(mStoryList.get(position).getBy())));
-        holder.num.setText(String.valueOf(mStoryList.get(position).getDescendants()));
+        if(mStoryList.get(position)!=null) {
+            holder.title.setText(String.valueOf(position + 1 + ": " + mStoryList.get(position).getTitle()));
+            holder.name.setText(String.valueOf(mStoryList.get(position).getUrl()));
+            Calendar calendar = Calendar.getInstance();
+            long time = mStoryList.get(position).getTime() * 1000;
+            calendar.setTimeInMillis(time);
+            SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy,HH:mm");
+            String s = f.format(calendar.getTime());
+            holder.time.setText(mContext.getResources().getString(R.string.txt_post, s, String.valueOf(mStoryList.get(position).getBy())));
+            holder.num.setText(String.valueOf(mStoryList.get(position).getDescendants()));
+
+        }
         return convertView;
     }
 

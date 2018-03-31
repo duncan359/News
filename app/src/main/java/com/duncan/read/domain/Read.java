@@ -28,11 +28,6 @@ public class Read extends Application {
         return StoryList;
     }
 
-    public void clearStoryList()
-    {
-        StoryList.clear();
-    }
-
     public void addStoryNoList(Integer add) {
         StoryNoList.add(add);
     }
@@ -47,17 +42,8 @@ public class Read extends Application {
     }
 
 
-    public void addCommentList(GetCommentResponse add) {
-        CommentList.add(add);
-    }
-
     public ArrayList<GetCommentResponse> getCommentList() {
         return CommentList;
-    }
-
-    public void clearCommentList()
-    {
-        CommentList.clear();
     }
 
     public void addCommentNoList(Integer add) {
@@ -73,18 +59,11 @@ public class Read extends Application {
         CommentNoList.clear();
     }
 
-    public void addReplyList(GetReplyResponse add) {
-        ReplyList.add(add);
-    }
 
     public ArrayList<GetReplyResponse> getReplyList() {
         return ReplyList;
     }
 
-    public void clearReplyList()
-    {
-        ReplyList.clear();
-    }
 
     public void addReplyNoList(Integer add) {
         ReplyNoList.add(add);
@@ -94,8 +73,4 @@ public class Read extends Application {
         return ReplyNoList;
     }
 
-    public void clearReplyNoList()
-    {
-        ReplyNoList.clear();
-    }
 }

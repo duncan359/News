@@ -8,11 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import com.duncan.read.R;
-import com.duncan.read.TextViewFixTouchConsume;
 import com.duncan.read.domain.data.GetCommentResponse;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -29,24 +26,18 @@ public class CommentsListAdapter extends BaseAdapter {
     private List<GetCommentResponse> mStoryList;
 
     public CommentsListAdapter(Context mContext, List<GetCommentResponse> mStoryList) {
-        mStoryList.clear();
-        notifyDataSetChanged();
         this.mContext = mContext;
         this.mStoryList = mStoryList;
     }
 
     public void addListItemToAdapter(List<GetCommentResponse> list) {
-        //Add list to current array list of data
         mStoryList.addAll(list);
-        //Notify UI
         this.notifyDataSetChanged();
     }
 
     public void resetListItemToAdapter(List<GetCommentResponse> list) {
-        //Add list to current array list of data
         mStoryList.clear();
         mStoryList.addAll(list);
-        //Notify UI
         this.notifyDataSetChanged();
     }
 
@@ -75,29 +66,27 @@ public class CommentsListAdapter extends BaseAdapter {
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         }
-        if(mStoryList.get(position).getText()!=null) {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
-                holder.title.setText(Html.fromHtml(mStoryList.get(position).getText(), Html.FROM_HTML_MODE_COMPACT));
-                holder.title.setMovementMethod(LinkMovementMethod.getInstance());
-            } else {
-                holder.title.setText(Html.fromHtml(mStoryList.get(position).getText()));
-                holder.title.setMovementMethod(LinkMovementMethod.getInstance());
+        if(mStoryList.get(position)!=null) {
+            if (mStoryList.get(position).getText() != null) {
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+                    holder.title.setText(Html.fromHtml(mStoryList.get(position).getText(), Html.FROM_HTML_MODE_COMPACT));
+                    holder.title.setMovementMethod(LinkMovementMethod.getInstance());
+                } else {
+                    holder.title.setText(Html.fromHtml(mStoryList.get(position).getText()));
+                    holder.title.setMovementMethod(LinkMovementMethod.getInstance());
+                }
             }
-        }
-        Calendar calendar = Calendar.getInstance();
-        long time = mStoryList.get(position).getTime()*1000;
-        calendar.setTimeInMillis(time);
-        //Date d = new Date(mStoryList.get(position).getTime());
-        SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy,HH:mm");
-       // f.setTimeZone(tz);
-        String s = f.format(calendar.getTime());
-        holder.time.setText(mContext.getResources().getString(R.string.txt_comments,s,String.valueOf(mStoryList.get(position).getBy())));
-        if(mStoryList.get(position).getKids()!=null) {
-            holder.num.setText(String.valueOf(mStoryList.get(position).getKids().size()));
-        }
-        else
-        {
-            holder.num.setText("0");
+            Calendar calendar = Calendar.getInstance();
+            long time = mStoryList.get(position).getTime() * 1000;
+            calendar.setTimeInMillis(time);
+            SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy,HH:mm");
+            String s = f.format(calendar.getTime());
+            holder.time.setText(mContext.getResources().getString(R.string.txt_comments, s, String.valueOf(mStoryList.get(position).getBy())));
+            if (mStoryList.get(position).getKids() != null) {
+                holder.num.setText(String.valueOf(mStoryList.get(position).getKids().size()));
+            } else {
+                holder.num.setText("0");
+            }
         }
         return convertView;
     }

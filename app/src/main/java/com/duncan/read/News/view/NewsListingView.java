@@ -15,17 +15,10 @@ public interface NewsListingView extends BaseView {
 
     void onGetNewslistingSuccess(List<Integer> resultList);
 
-    void onGetNewslistingFailure(String errorMessgae);
-
     void onGetStorylistingSuccess(List<GetStoryResponse> resultList);
-
-    void onGetStorylistingFailure(String errorMessgae);
 
     void onGetCommentlistingSuccess(List<GetCommentResponse> resultList);
 
-    void onGetCommentlistingFailure(String errorMessgae);
-
     void onGetReplylistingSuccess(List<GetReplyResponse> resultList);
 
-    void onGetReplylistingFailure(String errorMessgae);
 }

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +15,13 @@ import android.widget.ListView;
 import com.duncan.read.BaseActivity;
 import com.duncan.read.BaseFragment;
 import com.duncan.read.News.domain.UseCaseImpl;
-import com.duncan.read.News.presenter.Presenter;
+import com.duncan.read.News.presenter.GetNewsPresenter;
 import com.duncan.read.R;
 import com.duncan.read.domain.Read;
 import com.duncan.read.domain.RepositoryImpl;
 import com.duncan.read.domain.data.GetCommentResponse;
 import com.duncan.read.domain.data.GetReplyResponse;
 import com.duncan.read.domain.data.GetStoryResponse;
-import com.duncan.read.domain.presentation.logger.TimberLogger;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -48,22 +46,12 @@ public class MainFragment extends BaseFragment implements NewsListingView{
     public View ftView;
     public boolean isLoading = false;
     private StoryListAdapter adapter;
-    TimberLogger logger;
-    Presenter mPresenter;
+    GetNewsPresenter mGetNewsPresenter;
     ArrayList<GetStoryResponse> StoryList;
     public int currentId=20;
     public MainFragment() {
-        // Required empty public constructor
     }
 
-    public static MainFragment newInstance() {
-
-        Bundle args = new Bundle();
-
-        MainFragment fragment = new MainFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,10 +64,6 @@ public class MainFragment extends BaseFragment implements NewsListingView{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        // initializeInjector();
-        //TODO initialize the presenter here
-        //
         initializePresenter();
         mHandler = new MyHandler();
         StoryList = ((Read) getActivity().getApplication()).getStoryList();
@@ -96,11 +80,9 @@ public class MainFragment extends BaseFragment implements NewsListingView{
         lvProduct.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Do something
-                //Ex: display msg with product id get from view.getTag
                GetStoryResponse result =  (GetStoryResponse)adapter.getItem(position);
+               if(result!=null)
                 ((BaseActivity) getActivity()).getEventBus().post(new EventGetResult(result,"Success"));
-              //  Toast.makeText(getActivity().getApplicationContext(), "Clicked product id =" + adapter.getItem(position), Toast.LENGTH_SHORT).show();
             }
         });
         lvProduct.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -111,27 +93,18 @@ public class MainFragment extends BaseFragment implements NewsListingView{
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-                //Check when scroll to last item in listview, in this tut, init data in listview = 10 item
                 if(view.getLastVisiblePosition() == totalItemCount-1 && lvProduct.getCount() >=20&& isLoading == false) {
                     isLoading = true;
-//                    Thread thread = new ThreadGetMoreData();
-////////                    //Start thread
-//                    thread.start();
-                    Log.v("Duncan",""+currentId);
                     update();
                 }
-
             }
         });
     }
 
     private void initializePresenter() {
-
-        logger = new TimberLogger();
         eventBus = EventBus.getDefault();
-        mPresenter = new Presenter(new UseCaseImpl(new RepositoryImpl(),eventBus), eventBus);
-        mPresenter.setView(this);
+        mGetNewsPresenter = new GetNewsPresenter(new UseCaseImpl(new RepositoryImpl(),eventBus), eventBus);
+        mGetNewsPresenter.setView(this);
     }
 
 
@@ -141,7 +114,7 @@ public class MainFragment extends BaseFragment implements NewsListingView{
             public void run() {
                 isLoading = true;
                 currentId=0;
-                mPresenter.GetTopNews("topstories.json");
+                mGetNewsPresenter.GetTopNews("topstories.json");
             }
             },0);
         }
@@ -152,16 +125,13 @@ public class MainFragment extends BaseFragment implements NewsListingView{
         arraylist.clear();
         for(int i =0;i<10;i++)
         {
-            Log.v("Duncan","Size "+list.size());
             if(currentId+i<list.size()) {
                 arraylist.add(list.get(currentId+i));
-                Log.v("Duncan","Wei"+currentId+" ");
             }
-
         }
         if(arraylist.size()>0) {
             mHandler.sendEmptyMessage(0);
-            mPresenter.GetStory(arraylist);
+            mGetNewsPresenter.GetStory(arraylist);
         }
     }
     public class MyHandler extends Handler {
@@ -169,13 +139,10 @@ public class MainFragment extends BaseFragment implements NewsListingView{
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-                    //Add loading view during search processing
                     lvProduct.addFooterView(ftView);
                     break;
                 case 1:
-                    //Update data adapter and UI
                     adapter.addListItemToAdapter((ArrayList<GetStoryResponse>)msg.obj);
-                    //Remove loading view after update listview
                     lvProduct.removeFooterView(ftView);
                     isLoading=false;
                     break;
@@ -190,33 +157,15 @@ public class MainFragment extends BaseFragment implements NewsListingView{
             }
         }
     }
-    public class ThreadGetMoreData extends Thread {
-        @Override
-        public void run() {
-            List<Integer> arraylist = new ArrayList<Integer>();
-            List<Integer> list=((Read) getActivity().getApplication()).getStoryNoList();
-            arraylist.clear();
-            for(int i =0;i<10;i++)
-            {
-                Log.v("Duncan","Size "+list.size());
-                if(currentId+i<list.size()) {
-                    arraylist.add(list.get(currentId+i));
-                    Log.v("Duncan","Wei"+currentId+" ");
-                }
-
-            }
-            mPresenter.GetStory(arraylist);
-        }
-    }
 
     @Override
     protected void onResumePresenter() {
-        mPresenter.onResume(this);
+        mGetNewsPresenter.onResume(this);
     }
 
     @Override
     protected void onPausePresenter() {
-        mPresenter.onPause();
+        mGetNewsPresenter.onPause();
     }
 
     @Override
@@ -229,18 +178,12 @@ public class MainFragment extends BaseFragment implements NewsListingView{
             if(i<20)
             {
                 arraylist.add(resultList.get(i));
-                Log.v("Duncan",""+arraylist.get(i));
             }
-
         }
-       
-        mPresenter.GetStory(arraylist);
+        mGetNewsPresenter.GetStory(arraylist);
     }
 
-    @Override
-    public void onGetNewslistingFailure(String errorMessgae) {
 
-    }
 
     @Override
     public void onGetStorylistingSuccess(List<GetStoryResponse> resultList) {
@@ -263,40 +206,21 @@ public class MainFragment extends BaseFragment implements NewsListingView{
         mHandler.sendMessage(msg);
     }
 
-    @Override
-    public void onGetStorylistingFailure(String errorMessgae) {
 
-    }
 
     @Override
     public void onGetCommentlistingSuccess(List<GetCommentResponse> resultList) {
 
     }
 
-    @Override
-    public void onGetCommentlistingFailure(String errorMessgae) {
-
-    }
 
     @Override
     public void onGetReplylistingSuccess(List<GetReplyResponse> resultList) {
 
     }
 
-    @Override
-    public void onGetReplylistingFailure(String errorMessgae) {
 
-    }
 
-    @Override
-    public void showProgress() {
-
-    }
-
-    @Override
-    public void hideProgress() {
-
-    }
 
     public static class EventGetResult {
         public final String reponse;

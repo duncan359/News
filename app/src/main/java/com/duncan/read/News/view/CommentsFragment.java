@@ -9,7 +9,6 @@ import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,15 +20,13 @@ import android.widget.TextView;
 import com.duncan.read.BaseActivity;
 import com.duncan.read.BaseFragment;
 import com.duncan.read.News.domain.UseCaseImpl;
-import com.duncan.read.News.presenter.Presenter;
+import com.duncan.read.News.presenter.GetNewsPresenter;
 import com.duncan.read.R;
 import com.duncan.read.domain.Read;
 import com.duncan.read.domain.RepositoryImpl;
 import com.duncan.read.domain.data.GetCommentResponse;
 import com.duncan.read.domain.data.GetReplyResponse;
 import com.duncan.read.domain.data.GetStoryResponse;
-import com.duncan.read.domain.presentation.logger.TimberLogger;
-import com.fasterxml.jackson.core.sym.Name;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -68,22 +65,13 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
     public View ftView;
     public boolean isLoading = false;
     private CommentsListAdapter adapter;
-    TimberLogger logger;
     int id=0;
-    Presenter mPresenter;
+    GetNewsPresenter mGetNewsPresenter;
     ArrayList<GetCommentResponse> CommentList;
     public int currentId=0;
     public CommentsFragment() {
-        // Required empty public constructor
     }
 
-    public static CommentsFragment newInstance() {
-        Bundle args = new Bundle();
-
-        CommentsFragment fragment = new CommentsFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,16 +83,10 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        // initializeInjector();
-        //TODO initialize the presenter here
-        //
         initializePresenter();
         mHandler = new MyHandler();
         Intent i = getActivity().getIntent();
         GetStoryResponse dene = (GetStoryResponse)i.getSerializableExtra("Class");
-
-
         CommentList = ((Read) getActivity().getApplication()).getCommentList();
         adapter = new CommentsListAdapter(getActivity().getApplicationContext(), CommentList);
         LayoutInflater li = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -121,7 +103,7 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 GetCommentResponse result =  (GetCommentResponse) adapter.getItem(position);
-                if(result.getKids()!=null)
+                if(result!=null && result.getKids()!=null)
                 ((BaseActivity) getActivity()).getEventBus().post(new EventGetResult(result,"Success"));
             }
         });
@@ -130,11 +112,9 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
             }
-
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 lvProduct.requestFocus();
-                //Check when scroll to last item in listview, in this tut, init data in listview = 10 item
                 if(view.getLastVisiblePosition() == totalItemCount-1 && lvProduct.getCount() >=20&& isLoading == false) {
                     isLoading = true;
                     update();
@@ -143,19 +123,15 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
                         (lvProduct == null || lvProduct.getChildCount() == 0) ?
                                 0 : lvProduct.getChildAt(0).getTop();
                 mSwipeRefreshLayout.setEnabled(firstVisibleItem == 0 && topRowVerticalPosition >= 0);
-
-
             }
         });
         updateItem(dene);
     }
 
     private void initializePresenter() {
-
-        logger = new TimberLogger();
         eventBus = EventBus.getDefault();
-        mPresenter = new Presenter(new UseCaseImpl(new RepositoryImpl(),eventBus), eventBus);
-        mPresenter.setView(this);
+        mGetNewsPresenter = new GetNewsPresenter(new UseCaseImpl(new RepositoryImpl(),eventBus), eventBus);
+        mGetNewsPresenter.setView(this);
     }
 
     private void updateItem(GetStoryResponse response)
@@ -177,9 +153,7 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
             Calendar calendar = Calendar.getInstance();
             long time = response.getTime() * 1000;
             calendar.setTimeInMillis(time);
-            //Date d = new Date(mStoryList.get(position).getTime());
             SimpleDateFormat f = new SimpleDateFormat("dd.MM.yyyy,HH:mm");
-            // f.setTimeZone(tz);
             String s = f.format(calendar.getTime());
             Time.setText(getResources().getString(R.string.txt_post, s, String.valueOf(response.getBy())));
             Num.setText(String.valueOf(response.getDescendants()));
@@ -191,11 +165,9 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
                         ((Read) getActivity().getApplication()).addCommentNoList(kidlist.get(i));
                         if (i < 20) {
                             arraylist.add(kidlist.get(i));
-                            Log.v("Duncan", "" + arraylist.get(i));
                         }
-
                     }
-                    mPresenter.GetComment(arraylist);
+                    mGetNewsPresenter.GetComment(arraylist);
                 }
             }
             if (arraylist.size() > 0) {
@@ -214,7 +186,7 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
                 integers.add(id);
                 isLoading = true;
                 currentId=0;
-                mPresenter.GetStory(integers);
+                mGetNewsPresenter.GetStory(integers);
             }
             },0);
         }
@@ -225,15 +197,13 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
         arraylist.clear();
         for(int i =0;i<10;i++)
         {
-            Log.v("Duncan","Size "+list.size());
             if(currentId+i<list.size()) {
                 arraylist.add(list.get(currentId+i));
-                Log.v("Duncan","Wei"+currentId+" ");
             }
 
         }
         if(arraylist.size()>0) {
-            mPresenter.GetComment(arraylist);
+            mGetNewsPresenter.GetComment(arraylist);
             mHandler.sendEmptyMessage(0);
         }
     }
@@ -242,13 +212,10 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 0:
-                    //Add loading view during search processing
                     lvProduct.addFooterView(ftView);
                     break;
                 case 1:
-                    //Update data adapter and UI
                     adapter.addListItemToAdapter((ArrayList<GetCommentResponse>)msg.obj);
-                    //Remove loading view after update listview
                     lvProduct.removeFooterView(ftView);
                     mSwipeRefreshLayout.setRefreshing(false);
                     if(((Read) getActivity().getApplication()).getCommentNoList().size()>currentId)
@@ -270,42 +237,22 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
             }
         }
     }
-    public class ThreadGetMoreData extends Thread {
-        @Override
-        public void run() {
-            List<Integer> arraylist = new ArrayList<Integer>();
-            List<Integer> list=((Read) getActivity().getApplication()).getStoryNoList();
-            arraylist.clear();
-            for(int i =0;i<10;i++)
-            {
 
-                if(currentId+i<list.size()) {
-                    arraylist.add(list.get(currentId+i));
-
-                }
-
-            }
-            mPresenter.GetStory(arraylist);
-        }
-    }
 
     @Override
     protected void onResumePresenter() {
-        mPresenter.onResume(this);
+        mGetNewsPresenter.onResume(this);
     }
 
     @Override
     protected void onPausePresenter() {
-        mPresenter.onPause();
+        mGetNewsPresenter.onPause();
     }
 
     @Override
     public void onGetNewslistingSuccess(List<Integer> resultList) {
     }
 
-    @Override
-    public void onGetNewslistingFailure(String errorMessgae) {
-    }
 
     @Override
     public void onGetStorylistingSuccess(List<GetStoryResponse> resultList) {
@@ -316,15 +263,11 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
         }
     }
 
-    @Override
-    public void onGetStorylistingFailure(String errorMessgae) {
-
-    }
 
     @Override
     public void onGetCommentlistingSuccess(List<GetCommentResponse> resultList) {
         Message msg;
-        ArrayList<GetCommentResponse> lstResult = new ArrayList<GetCommentResponse>();
+        ArrayList<GetCommentResponse> lstResult = new ArrayList<>();
         lstResult.clear();
         if(resultList.size()>0) {
         for(int i =0;i<resultList.size();i++)
@@ -345,30 +288,15 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
         }
     }
 
-    @Override
-    public void onGetCommentlistingFailure(String errorMessgae) {
 
-    }
 
     @Override
     public void onGetReplylistingSuccess(List<GetReplyResponse> resultList) {
 
     }
 
-    @Override
-    public void onGetReplylistingFailure(String errorMessgae) {
 
-    }
 
-    @Override
-    public void showProgress() {
-
-    }
-
-    @Override
-    public void hideProgress() {
-
-    }
 
     public static class EventGetResult {
         public final String reponse;

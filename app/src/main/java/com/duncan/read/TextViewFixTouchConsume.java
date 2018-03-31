@@ -1,15 +1,9 @@
 package com.duncan.read;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.text.Html;
 import android.text.Layout;
-import android.text.Selection;
 import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
-import android.text.method.Touch;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -22,8 +16,6 @@ import android.widget.TextView;
 
 
 public class TextViewFixTouchConsume extends android.support.v7.widget.AppCompatTextView {
-    boolean dontConsumeNonUrlClicks = true;
-    boolean linkHit;
     public TextViewFixTouchConsume(Context context) {
         super(context);
         init();

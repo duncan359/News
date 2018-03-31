@@ -17,19 +17,16 @@ import retrofit2.http.Url;
  */
 
 public interface ConnectAPI {
-//    @Headers("Content-Type: application/raw")
-//    @POST("Login")
-//    Observable<SenderLoginResponse1> SenderLogin(@Body SenderLoginRequest1 request);
 
     @GET
-    public Call<List<Integer>> GetTopNews(@Url String url);
+     Call<List<Integer>> GetTopNews(@Url String url);
 
     @GET
-    public Call<GetStoryResponse> GetStory(@Url String url);
+     Call<GetStoryResponse> GetStory(@Url String url);
 
     @GET
-    public Call<GetCommentResponse> GetCommend(@Url String url);
+     Call<GetCommentResponse> GetCommend(@Url String url);
 
     @GET
-    public Call<GetReplyResponse> GetReply(@Url String url);
+     Call<GetReplyResponse> GetReply(@Url String url);
 }

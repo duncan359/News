@@ -1,12 +1,9 @@
 package com.duncan.read.News.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.widget.Toast;
 
 
 import com.duncan.read.BaseActivity;
@@ -17,13 +14,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
 
-public class SplashScreen extends BaseActivity {
+public class SplashScreenActivity extends BaseActivity {
     Context context;
 
-    public static Intent getCallingIntent(Context context) {
-
-        return new Intent(context, SplashScreen.class);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +25,7 @@ public class SplashScreen extends BaseActivity {
         ButterKnife.bind(this);
         this.context = this;
         if(!checkNetwork())
-        Toast.makeText(this,R.string.txt_titleintenet+"",Toast.LENGTH_SHORT).show();
+            showToast(this.getString(R.string.txt_titleintenet));
     }
 
     @Override
@@ -66,7 +59,6 @@ public class SplashScreen extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(SplashScreenFragment.EventGetResult event) {
-        //TODO pass inbox item to activity
         if(event.reponse.equals("Success"))
         {
             finish();

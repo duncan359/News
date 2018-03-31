@@ -11,41 +11,27 @@ import android.view.ViewGroup;
 import com.duncan.read.BaseActivity;
 import com.duncan.read.BaseFragment;
 import com.duncan.read.News.domain.UseCaseImpl;
-import com.duncan.read.News.presenter.Presenter;
+import com.duncan.read.News.presenter.GetNewsPresenter;
 import com.duncan.read.R;
 import com.duncan.read.domain.Read;
 import com.duncan.read.domain.RepositoryImpl;
 import com.duncan.read.domain.data.GetCommentResponse;
 import com.duncan.read.domain.data.GetReplyResponse;
 import com.duncan.read.domain.data.GetStoryResponse;
-import com.duncan.read.domain.presentation.logger.TimberLogger;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SplashScreenFragment extends BaseFragment implements NewsListingView {
-    Presenter mPresenter;
+    GetNewsPresenter mGetNewsPresenter;
     EventBus eventBus;
-    TimberLogger logger;
 
 
 
 
     public SplashScreenFragment() {
-        // Required empty public constructor
-    }
-
-    public static SplashScreenFragment newInstance() {
-
-        Bundle args = new Bundle();
-        SplashScreenFragment fragment = new SplashScreenFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
 
@@ -59,45 +45,30 @@ public class SplashScreenFragment extends BaseFragment implements NewsListingVie
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        // initializeInjector();
-        //TODO initialize the presenter here
-        //mPresenter = new LoginPresenter(new LoginUsecaseImpl(new RepositoryImpl()), logger, eventBus);
-
         initializePresenter();
-        mPresenter.setView(this);
+        mGetNewsPresenter.setView(this);
     }
 
     private void initializePresenter() {
-
-        logger = new TimberLogger();
+        
         eventBus = EventBus.getDefault();
-        mPresenter = new Presenter(new UseCaseImpl(new RepositoryImpl(),eventBus), eventBus);
-        mPresenter.setView(this);
-        mPresenter.GetTopNews("topstories.json");
+        mGetNewsPresenter = new GetNewsPresenter(new UseCaseImpl(new RepositoryImpl(),eventBus), eventBus);
+        mGetNewsPresenter.setView(this);
+        mGetNewsPresenter.GetTopNews("topstories.json");
     }
 
 
     @Override
     protected void onResumePresenter() {
-        mPresenter.onResume(this);
+        mGetNewsPresenter.onResume(this);
     }
 
     @Override
     protected void onPausePresenter() {
-        mPresenter.onPause();
+        mGetNewsPresenter.onPause();
     }
 
-    @Override
-    public void showProgress() {
 
-        logger.logD("ActivateFragment", "showProgress");
-    }
-
-    @Override
-    public void hideProgress() {
-        logger.logD("ActivateFragment", "hideProgress");
-    }
 
     @Override
     public void onGetNewslistingSuccess(List<Integer> resultList) {
@@ -108,18 +79,11 @@ public class SplashScreenFragment extends BaseFragment implements NewsListingVie
             if(i<20)
             {
                 arraylist.add(resultList.get(i));
-                Log.v("Duncan",""+arraylist.get(i));
             }
-
         }
-
-        mPresenter.GetStory(arraylist);
+        mGetNewsPresenter.GetStory(arraylist);
     }
 
-    @Override
-    public void onGetNewslistingFailure(String errorMessgae) {
-
-    }
 
     @Override
     public void onGetStorylistingSuccess(List<GetStoryResponse> resultList) {
@@ -132,28 +96,15 @@ public class SplashScreenFragment extends BaseFragment implements NewsListingVie
         ((BaseActivity) getActivity()).getEventBus().post(new EventGetResult("Success"));
     }
 
-    @Override
-    public void onGetStorylistingFailure(String errorMessgae) {
-
-    }
 
     @Override
     public void onGetCommentlistingSuccess(List<GetCommentResponse> resultList) {
 
     }
 
-    @Override
-    public void onGetCommentlistingFailure(String errorMessgae) {
-
-    }
 
     @Override
     public void onGetReplylistingSuccess(List<GetReplyResponse> resultList) {
-
-    }
-
-    @Override
-    public void onGetReplylistingFailure(String errorMessgae) {
 
     }
 
@@ -168,8 +119,4 @@ public class SplashScreenFragment extends BaseFragment implements NewsListingVie
         }
     }
 
-
-    /**
-     * Event indicating forgotPassword has been pressed
-     */
 }

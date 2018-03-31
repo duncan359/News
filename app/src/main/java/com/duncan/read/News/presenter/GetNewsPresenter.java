@@ -16,13 +16,14 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by Duncan Lim on 21/3/2018.
  */
 
-public class Presenter extends BasePresenter {
+public class GetNewsPresenter extends BasePresenter {
 
     private UseCase Usecase;
     private EventBus eventBus;
@@ -33,7 +34,8 @@ public class Presenter extends BasePresenter {
     List<GetStoryResponse> resultlist = new ArrayList<GetStoryResponse>();
     List<GetCommentResponse> commentlist = new ArrayList<GetCommentResponse>();
     List<GetReplyResponse> replylist = new ArrayList<GetReplyResponse>();
-    public Presenter(UseCase useCase,  EventBus eventBus)
+    List<Integer> arraylist=new ArrayList<Integer>();
+    public GetNewsPresenter(UseCase useCase, EventBus eventBus)
     {
         this.Usecase=useCase;
         this.eventBus=eventBus;
@@ -48,38 +50,40 @@ public class Presenter extends BasePresenter {
         Usecase.GetTopNewsListing(Url);
     }
 
-    public void GetStory(@NonNull final List<Integer> arraylist)
+    public void GetStory(@NonNull final List<Integer> urllist)
     {
+        this.arraylist=urllist;
         resultlist.clear();
-        count = arraylist.size();
-        for(int i=0;i<arraylist.size();i++)
+        count = urllist.size();
+        for(int i=0;i<urllist.size();i++)
         {
-        Usecase.GetStoryListing("item/"+arraylist.get(i)+".json");
+        Usecase.GetStoryListing("item/"+urllist.get(i)+".json");
         }
     }
 
-    public void GetComment(@NonNull final List<Integer> arraylist)
+    public void GetComment(@NonNull final List<Integer> urllist)
     {
+        this.arraylist=urllist;
         commentlist.clear();
-        commentcount = arraylist.size();
-        for(int i=0;i<arraylist.size();i++)
+        commentcount = urllist.size();
+        for(int i=0;i<urllist.size();i++)
         {
-            Usecase.GetCommentListing("item/"+arraylist.get(i)+".json");
+            Usecase.GetCommentListing("item/"+urllist.get(i)+".json");
         }
     }
 
-    public void GetReply(@NonNull final List<Integer> arraylist)
+    public void GetReply(@NonNull final List<Integer> urllist)
     {
+        this.arraylist=urllist;
         replylist.clear();
-        replycount = arraylist.size();
-        for(int i=0;i<arraylist.size();i++)
+        replycount = urllist.size();
+        for(int i=0;i<urllist.size();i++)
         {
-            Usecase.GetReplyListing("item/"+arraylist.get(i)+".json");
+            Usecase.GetReplyListing("item/"+urllist.get(i)+".json");
         }
     }
     @Override
     public void onPause() {
-        hideLoading();
         this.listingView = null;
         eventBus.unregister(this);
     }
@@ -90,29 +94,11 @@ public class Presenter extends BasePresenter {
         eventBus.register(this);
     }
 
-    @Override
-    protected void showLoading() {
-        if (listingView != null) {
-            listingView.showProgress();
-        }
-    }
 
-    @Override
-    protected void hideLoading() {
-        if (listingView != null) {
-            listingView.hideProgress();
-        }
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onActivateResult(UseCaseImpl.EventTopNewListing event) {
-
-        hideLoading();
-        //TODO check the login result and update view
         if (event.exception != null) {
-            //TODO get error message from ErrorMessage factory
-            listingView.onGetNewslistingFailure("Fail");
-
         } else {
             listingView.onGetNewslistingSuccess(event.reponse);
         }
@@ -120,20 +106,17 @@ public class Presenter extends BasePresenter {
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onStorysesult(UseCaseImpl.EventStoryListing event) {
-
-        hideLoading();
-        //TODO check the login result and update view
+    public void onStoryresult(UseCaseImpl.EventStoryListing event) {
         count--;
-        if (event.exception != null) {
-            //TODO get error message from ErrorMessage factory
-            listingView.onGetStorylistingFailure("Fail");
-
-        } else {
-
-            resultlist.add(event.reponse);
-
+        resultlist.add(event.reponse);
+        if (event.exception == null) {
             if(count==0) {
+                for(int index=0;index<resultlist.size();index++)
+                {
+                    if(resultlist.get(index)!=null)
+                    resultlist.add(arraylist.indexOf(resultlist.get(index).getId()),resultlist.remove(index));
+                }
+
                 listingView.onGetStorylistingSuccess(resultlist);
             }
         }
@@ -141,19 +124,15 @@ public class Presenter extends BasePresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCommentsesult(UseCaseImpl.EventCommentListing event) {
-
-        hideLoading();
-        //TODO check the login result and update view
         commentcount--;
-        if (event.exception != null) {
-            //TODO get error message from ErrorMessage factory
-            listingView.onGetCommentlistingFailure("Fail");
-
-        } else {
-
-            commentlist.add(event.reponse);
-
+        commentlist.add(event.reponse);
+        if (event.exception == null) {
             if(commentcount==0) {
+                for(int index=0;index<commentlist.size();index++)
+                {
+                    if(commentlist.get(index)!=null)
+                    commentlist.add(arraylist.indexOf(commentlist.get(index).getId()),commentlist.remove(index));
+                }
                 listingView.onGetCommentlistingSuccess(commentlist);
             }
         }
@@ -161,18 +140,16 @@ public class Presenter extends BasePresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReplyesult(UseCaseImpl.EventReplyListing event) {
-
-        hideLoading();
-        //TODO check the login result and update view
         replycount--;
-        if (event.exception != null) {
-            //TODO get error message from ErrorMessage factory
-            listingView.onGetReplylistingFailure("Fail");
+        replylist.add(event.reponse);
+        if (event.exception == null) {
 
-        } else {
-
-            replylist.add(event.reponse);
             if(replycount==0) {
+                for(int index=0;index<replylist.size();index++)
+                {
+                    if(replylist.get(index)!=null)
+                    replylist.add(arraylist.indexOf(replylist.get(index).getId()),replylist.remove(index));
+                }
                 listingView.onGetReplylistingSuccess(replylist);
             }
         }

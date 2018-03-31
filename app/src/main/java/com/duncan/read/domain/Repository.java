@@ -14,7 +14,7 @@ import java.util.List;
  */
 
 public interface Repository {
-    public void TopNews(String URL, @NonNull GetTopNewsCallBack callBack);
+     void TopNews(String URL, @NonNull GetTopNewsCallBack callBack);
 
     interface GetTopNewsCallBack {
         void onSuccess(List<Integer> response);
@@ -22,7 +22,7 @@ public interface Repository {
         void onFailure(Exception e);
     }
 
-    public void GetStory(String URL, @NonNull GetStoryCallBack callBack);
+     void GetStory(String URL, @NonNull GetStoryCallBack callBack);
 
     interface GetStoryCallBack {
         void onSuccess(GetStoryResponse response);
@@ -30,7 +30,7 @@ public interface Repository {
         void onFailure(Exception e);
     }
 
-    public void GetComment(String URL, @NonNull GetCommentCallBack callBack);
+     void GetComment(String URL, @NonNull GetCommentCallBack callBack);
 
     interface GetCommentCallBack {
         void onSuccess(GetCommentResponse response);
@@ -38,7 +38,7 @@ public interface Repository {
         void onFailure(Exception e);
     }
 
-    public void GetReply(String URL, @NonNull GetReplyCallBack callBack);
+     void GetReply(String URL, @NonNull GetReplyCallBack callBack);
 
     interface GetReplyCallBack {
         void onSuccess(GetReplyResponse response);
