@@ -1,6 +1,7 @@
 package com.duncan.read.domain;
 
 import android.app.Application;
+import android.support.multidex.MultiDex;
 
 import com.duncan.read.domain.data.GetCommentResponse;
 import com.duncan.read.domain.data.GetReplyResponse;
@@ -13,12 +14,21 @@ import java.util.ArrayList;
  */
 
 public class Read extends Application {
+
+
     public ArrayList<GetReplyResponse> ReplyList = new ArrayList<GetReplyResponse>();
     public ArrayList<GetCommentResponse> CommentList = new ArrayList<GetCommentResponse>();
     public ArrayList<GetStoryResponse> StoryList = new ArrayList<GetStoryResponse>();
     public ArrayList<Integer> StoryNoList = new ArrayList<Integer>();
     public ArrayList<Integer> ReplyNoList = new ArrayList<Integer>();
     public ArrayList<Integer> CommentNoList = new ArrayList<Integer>();
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        MultiDex.install(this);
+    }
+
 
     public void addStoryList(GetStoryResponse add) {
         StoryList.add(add);
