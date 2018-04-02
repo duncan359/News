@@ -249,9 +249,7 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
         mGetNewsPresenter.onPause();
     }
 
-    @Override
-    public void onGetNewslistingSuccess(List<Integer> resultList) {
-    }
+
 
 
     @Override
@@ -292,10 +290,13 @@ public class CommentsFragment extends BaseFragment implements NewsListingView{
 
     @Override
     public void onGetReplylistingSuccess(List<GetReplyResponse> resultList) {
-
+        throw new UnsupportedOperationException("This functionality has not been implemented yet.");
     }
 
-
+    @Override
+    public void onGetNewslistingSuccess(List<Integer> resultList) {
+        throw new UnsupportedOperationException("This functionality has not been implemented yet.");
+    }
 
 
     public static class EventGetResult {

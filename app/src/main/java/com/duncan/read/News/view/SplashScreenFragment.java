@@ -2,8 +2,6 @@ package com.duncan.read.News.view;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,13 +97,13 @@ public class SplashScreenFragment extends BaseFragment implements NewsListingVie
 
     @Override
     public void onGetCommentlistingSuccess(List<GetCommentResponse> resultList) {
-
+        throw new UnsupportedOperationException("This functionality has not been implemented yet.");
     }
 
 
     @Override
     public void onGetReplylistingSuccess(List<GetReplyResponse> resultList) {
-
+        throw new UnsupportedOperationException("This functionality has not been implemented yet.");
     }
 
 

@@ -220,11 +220,12 @@ public class ReplyFragment extends BaseFragment implements NewsListingView{
 
     @Override
     public void onGetNewslistingSuccess(List<Integer> resultList) {
+        throw new UnsupportedOperationException("This functionality has not been implemented yet.");
     }
 
     @Override
     public void onGetStorylistingSuccess(List<GetStoryResponse> resultList) {
-
+        throw new UnsupportedOperationException("This functionality has not been implemented yet.");
     }
 
 

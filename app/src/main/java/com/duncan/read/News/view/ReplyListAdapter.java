@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.duncan.read.R;
-import com.duncan.read.domain.data.GetCommentResponse;
 import com.duncan.read.domain.data.GetReplyResponse;
 
 import java.text.SimpleDateFormat;
@@ -39,10 +38,8 @@ public class ReplyListAdapter extends BaseAdapter {
     }
 
     public void resetListItemToAdapter(List<GetReplyResponse> list) {
-        //Add list to current array list of data
         mStoryList.clear();
         mStoryList.addAll(list);
-        //Notify UI
         this.notifyDataSetChanged();
     }
 
